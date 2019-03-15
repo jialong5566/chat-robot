@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>聊天机器人</title>
+    <link rel="stylesheet" href="index.css">
+
+</head>
+<body>
+    <div id="chat">
+        <div class="head">聊天机器人</div>
+        <div class="content" ></div>
+        <div class="input">
+            <input type="text" id="chatArea" onkeydown="send(event)">
+            <div id="sendBtn" onclick="send(event)">发送</div>
+        </div>
+    </div>
+    <script>
+        var ps = document.getElementsByTagName("p");
+        var content = document.getElementsByClassName("content")[0];
+        function send(event) {
+            if(event instanceof KeyboardEvent && event.key!="Enter"){
+                return
+            }
+            var val = document.getElementById("chatArea").value;
+            if(val==null||val ==""){
+                return
+            }
+            var me = document.createElement("p");
+            me.className= "me";
+            me.innerHTML="我：" + val;
+            document.getElementsByClassName("content")[0].appendChild(me);
+            var ajax = new XMLHttpRequest();
+            ajax.open("get","http://192.168.1.3:12306/chat?text="+ val);
+            ajax.send();
+            ajax.onreadystatechange=function(){
+                if(ajax.readyState==4&&ajax.status==200){
+                    var temp = document.createElement("p");
+                    temp.className = "robot";
+                    temp.innerHTML = "机器人："+ JSON.parse(ajax.responseText).text;
+                    document.getElementsByClassName("content")[0].appendChild(temp);
+                }
+            }
+            document.getElementById("chatArea").value = "";
+
+            setTimeout(function () {
+                ps[ps.length-1].scrollIntoViewIfNeeded({
+                    block:"end",
+                    behavior:"smooth"
+                })
+
+            },500)
+
+        }
+    </script>
+</body>
+</html>
